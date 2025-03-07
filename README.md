@@ -1,0 +1,1 @@
+“This project is a food traceability website where farmers log food items and consumers scan QR codes to see their origins.”
