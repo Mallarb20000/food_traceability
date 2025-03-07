@@ -73,8 +73,8 @@ WSGI_APPLICATION = 'food_traceability.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-python
-     DATABASES = {
+
+DATABASES = {
          'default': {
              'ENGINE': 'django.db.backends.mysql',
              'NAME': 'food_traceability_db',
