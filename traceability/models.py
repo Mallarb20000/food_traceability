@@ -9,6 +9,7 @@ class FoodItem(models.Model):
     batch_number = models.CharField(max_length=50, unique=True)
     farmer = models.ForeignKey(CustomUser, on_delete=models.CASCADE, limit_choices_to={'role': 'farmer'})
     created_at = models.DateTimeField(auto_now_add=True)
+    qr_code = models.ImageField(upload_to='qr_codes/', null=True, blank=True)
 
     def __str__(self):
         return f"{self.name} - {self.batch_number}"
@@ -23,3 +24,4 @@ class TransportLog(models.Model):
 
     def __str__(self):
         return f"{self.food_item.name} to {self.destination}"
+
