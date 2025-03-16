@@ -132,3 +132,17 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'users.CustomUser'
+
+# REST Framework
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication', #For API Clients
+        'rest_framework.authentication.SessionAuthentication', #For Browsers API
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated', 
+    ],
+}
+LOGIN_URL = '/accounts/login/'
+LOGIN_REDIRECT_URL = '/api/food-items/'  # After login, go to API
+LOGOUT_REDIRECT_URL = '/api/food-items/'  # After logout, back to API
