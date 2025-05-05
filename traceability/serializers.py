@@ -5,7 +5,7 @@ class FoodItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = FoodItem
         fields = ['id', 'name', 'origin', 'batch_number', 'farmer', 'created_at','qr_code']
-        read_only_fields = ['farmer', 'created_at']
+        read_only_fields = ['farmer', 'created_at', 'qr_code']
 
 class TransportLogSerializer(serializers.ModelSerializer):
     class Meta:

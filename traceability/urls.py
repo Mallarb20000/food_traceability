@@ -8,4 +8,5 @@ router.register(r'transport-logs', TransportLogViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
+    path('api/users/', include('users.urls')),
 ]

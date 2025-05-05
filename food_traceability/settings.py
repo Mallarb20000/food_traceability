@@ -10,8 +10,8 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
-from pathlib import Path
 import os
+from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -28,6 +28,10 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+
 
 # Application definition
 
@@ -42,9 +46,12 @@ INSTALLED_APPS = [
     'traceability',
     'rest_framework.authtoken',
     'rest_framework',
+    'corsheaders',
+    
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -52,7 +59,10 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    
 ]
+
+CORS_ALLOW_ALL_ORIGINS = True
 
 ROOT_URLCONF = 'food_traceability.urls'
 
@@ -84,7 +94,7 @@ DATABASES = {
              'ENGINE': 'django.db.backends.mysql',
              'NAME': 'food_traceability_db',
              'USER': 'root',
-             'PASSWORD': 'admin',  # Your password from Task 2.1
+             'PASSWORD': 'admin', 
              'HOST': 'localhost',
              'PORT': '3306',
          }
@@ -128,26 +138,18 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
-# Media files (User-uploaded content)
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'users.CustomUser'
 
-# REST Framework
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication', #For API Clients
-        'rest_framework.authentication.SessionAuthentication', #For Browsers API
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.SessionAuthentication',  # Optional for admin
     ],
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated', 
+        'rest_framework.permissions.IsAuthenticated',
     ],
 }
-LOGIN_URL = '/accounts/login/'
-LOGIN_REDIRECT_URL = '/api/food-items/'  # After login, go to API
-LOGOUT_REDIRECT_URL = '/api/food-items/'  # After logout, back to API

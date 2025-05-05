@@ -10,6 +10,7 @@ urlpatterns = [
     path('accounts/login/', auth_views.LoginView.as_view(template_name='admin/login.html'), name='login'),
     path('accounts/logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('api-auth/', include('rest_framework.urls')),
+    path('api/users/', include('users.urls')), 
 ]
 
 if settings.DEBUG:
