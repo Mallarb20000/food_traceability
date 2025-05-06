@@ -22,6 +22,7 @@ const Login = () => {
       localStorage.setItem("access", access);
       localStorage.setItem("refresh", refresh);
       localStorage.setItem("role", role);
+      localStorage.setItem("username", username); 
 
       // Redirect based on role
       if (role === "farmer") {

@@ -1,21 +1,40 @@
-import logo from './logo.svg';
 import './App.css';
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Routes, Route, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import FarmerDashboard from './pages/FarmerDashboard';
 import RetailerDashboard from './pages/RetailerDashboard';
 import GeneralDashboard from './pages/GeneralDashboard';
 import PrivateRoute from "./components/PrivateRoutes";
+import Navbar from "./components/Navbar";
 
 function App() {
+  const [role, setRole] = useState(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    setRole(localStorage.getItem("role"));
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.clear();
+    navigate("/login");
+  };
+
   return (
-    <Router>
-    <Routes>
-      <Route path="/" element={<div>Welcome to Food Traceability</div>} />  
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
-      <Route
+    <>
+      <Navbar />
+
+
+      {/* ✅ Routes */}
+      <Routes>
+        <Route path="/" element={<div className="p-4">Welcome to Food Traceability</div>} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+
+        <Route
           path="/dashboard"
           element={
             <PrivateRoute>
@@ -40,7 +59,7 @@ function App() {
           }
         />
       </Routes>
-    </Router>
+    </>
   );
 }
 
