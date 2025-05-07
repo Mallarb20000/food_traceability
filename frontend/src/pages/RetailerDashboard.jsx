@@ -21,34 +21,29 @@ const RetailerDashboard = () => {
   });
 
   const token = localStorage.getItem("access");
-
   const headers = {
     Authorization: `Bearer ${token}`,
+    "Content-Type": "application/json"
   };
 
-  const fetchItems = async () => {
-    try {
-      const res = await axios.get("http://localhost:8000/api/food-items/", { headers });
-      setItems(res.data);
-    } catch (err) {
-      console.error("Error fetching food items", err);
-    }
-  };
-
-  const fetchTransportLogs = async () => {
-    try {
-      const res = await axios.get("http://localhost:8000/api/transport-logs/", { headers });
-      setTransportLogs(res.data);
-    } catch (err) {
-      console.error("Error fetching transport logs", err);
-    }
-  };
-
+  // Fetch available food items and transport logs together
   useEffect(() => {
-    fetchItems();
-    fetchTransportLogs();
+    const fetchData = async () => {
+      try {
+        const [itemsRes, logsRes] = await Promise.all([
+          axios.get("http://localhost:8000/api/food-items/", { headers }),
+          axios.get("http://localhost:8000/api/transport-logs/", { headers }),
+        ]);
+        setItems(itemsRes.data);
+        setTransportLogs(logsRes.data);
+      } catch (err) {
+        console.error("Error fetching dashboard data", err);
+      }
+    };
+    fetchData();
   }, []);
 
+  // Open QR modal: ensure the URL has the correct prefix so it shows properly.
   const openQR = (item) => {
     setQRItem(item);
     setShowQRModal(true);
@@ -64,36 +59,62 @@ const RetailerDashboard = () => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  // Instead of directly submitting transport log, prompt confirmation.
   const confirmTransport = (e) => {
     e.preventDefault();
     setShowTransportModal(false);
     setShowConfirmModal(true);
   };
 
+  
+
+  const fetchTransportLogs = async () => {
+    try {
+      const res = await axios.get("http://localhost:8000/api/transport-logs/", { headers });
+      setTransportLogs(res.data);
+    } catch (err) {
+      console.error("Error fetching transport logs", err);
+    }
+  };
+
   const submitTransport = async () => {
     try {
       await axios.post(
         "http://localhost:8000/api/transport-logs/",
-        {
-          food_item: selectedItem.id,
-          ...form,
-        },
+        { food_item: selectedItem.id, ...form },
         { headers }
       );
+      
       toast.success("Transport log added successfully!");
       setShowConfirmModal(false);
       fetchTransportLogs();
     } catch (err) {
-      console.error("Failed to add transport log", err);
-      toast.error("Error adding transport log");
+      console.error("⚠️ Transport POST failed:", err.response?.status, err.response?.data);
+      toast.error("Failed to add transport log");
     }
   };
-
+  
+  const markOnShelf = async (logId) => {
+    try {
+      await axios.patch(
+        `http://localhost:8000/api/transport-logs/${logId}/`,
+        { on_shelf: true },
+        { headers }
+      );
+      
+      toast.success("Marked as on shelf!");
+      fetchTransportLogs();
+    } catch (err) {
+      console.error("⚠️ PATCH on_shelf failed:", err.response?.status, err.response?.data);
+      toast.error("Failed to update status");
+    }
+  };
+  
   return (
     <div className="container mt-4">
       <h2>Retailer Dashboard</h2>
 
-      {/* ✅ Top: Logged Transport */}
+      {/* Transport Logs Table */}
       <h4 className="mt-4">Transported Items</h4>
       <table className="table table-bordered table-sm">
         <thead>
@@ -103,22 +124,33 @@ const RetailerDashboard = () => {
             <th>Vehicle</th>
             <th>Date</th>
             <th>On Shelf</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           {transportLogs.map((log) => (
             <tr key={log.id}>
-              <td>{log.food_item}</td>
+              <td>{log.food_item?.name || log.food_item}</td>
               <td>{log.destination}</td>
               <td>{log.vehicle_details}</td>
               <td>{new Date(log.transport_date).toLocaleString()}</td>
               <td>{log.on_shelf ? "✅ Yes" : "⏳ No"}</td>
+              <td>
+                {!log.on_shelf && (
+                  <button
+                    className="btn btn-sm btn-outline-success"
+                    onClick={() => markOnShelf(log.id)}
+                  >
+                    Mark as On Shelf
+                  </button>
+                )}
+              </td>
             </tr>
           ))}
         </tbody>
       </table>
 
-      {/* ✅ Food Items Table */}
+      {/* Food Items Table */}
       <h4 className="mt-5">Available Food Items</h4>
       <table className="table table-striped table-hover">
         <thead>
@@ -137,12 +169,14 @@ const RetailerDashboard = () => {
               <td>{item.origin}</td>
               <td>{item.batch_number}</td>
               <td>
-                <button
-                  className="btn btn-sm btn-outline-primary"
-                  onClick={() => openQR(item)}
-                >
-                  View QR
-                </button>
+                {item.qr_code && (
+                  <button
+                    className="btn btn-sm btn-outline-primary"
+                    onClick={() => openQR(item)}
+                  >
+                    View QR
+                  </button>
+                )}
               </td>
               <td>
                 <button
@@ -159,24 +193,27 @@ const RetailerDashboard = () => {
 
       <ToastContainer position="top-right" autoClose={3000} />
 
-      {/* ✅ QR Modal */}
+      {/* QR Modal */}
       <Modal show={showQRModal} onHide={() => setShowQRModal(false)} centered>
-        <Modal.Header closeButton>
-          <Modal.Title>QR Code</Modal.Title>
-        </Modal.Header>
-        <Modal.Body className="text-center">
-          {qrItem?.qr_code && (
-            <img
-              src={`http://localhost:8000/media/${qrItem.qr_code}`}
-              alt="QR Code"
-              className="img-fluid"
-              style={{ maxHeight: "300px" }}
-            />
-          )}
-        </Modal.Body>
-      </Modal>
+  <Modal.Header closeButton>
+    <Modal.Title>QR Code</Modal.Title>
+  </Modal.Header>
+  <Modal.Body className="text-center">
+    {qrItem?.qr_code ? (
+      <img
+        src={qrItem.qr_code}
+        alt="QR Code"
+        className="img-fluid"
+        style={{ maxHeight: "300px" }}
+      />
+    ) : (
+      <p className="text-muted">No QR available</p>
+    )}
+  </Modal.Body>
+</Modal>
 
-      {/* ✅ Transport Form Modal */}
+
+      {/* Transport Log Modal */}
       <Modal show={showTransportModal} onHide={() => setShowTransportModal(false)}>
         <Modal.Header closeButton>
           <Modal.Title>Add Transport Log</Modal.Title>
@@ -194,7 +231,7 @@ const RetailerDashboard = () => {
               />
             </Form.Group>
             <Form.Group className="mb-2">
-              <Form.Label>Vehicle</Form.Label>
+              <Form.Label>Vehicle Details</Form.Label>
               <Form.Control
                 type="text"
                 name="vehicle_details"
@@ -213,14 +250,14 @@ const RetailerDashboard = () => {
                 required
               />
             </Form.Group>
-            <Button type="submit" variant="primary">
+            <Button variant="primary" type="submit">
               Proceed
             </Button>
           </Form>
         </Modal.Body>
       </Modal>
 
-      {/* ✅ Confirm Modal */}
+      {/* Confirmation Modal */}
       <Modal show={showConfirmModal} onHide={() => setShowConfirmModal(false)} centered>
         <Modal.Header closeButton>
           <Modal.Title>Confirm Transport Log</Modal.Title>
@@ -228,10 +265,18 @@ const RetailerDashboard = () => {
         <Modal.Body>
           <p>Are you sure you want to add this transport log?</p>
           <ul>
-            <li><strong>Item:</strong> {selectedItem?.name}</li>
-            <li><strong>Destination:</strong> {form.destination}</li>
-            <li><strong>Vehicle:</strong> {form.vehicle_details}</li>
-            <li><strong>Date:</strong> {form.transport_date}</li>
+            <li>
+              <strong>Item:</strong> {selectedItem?.name}
+            </li>
+            <li>
+              <strong>Destination:</strong> {form.destination}
+            </li>
+            <li>
+              <strong>Vehicle:</strong> {form.vehicle_details}
+            </li>
+            <li>
+              <strong>Date:</strong> {form.transport_date}
+            </li>
           </ul>
         </Modal.Body>
         <Modal.Footer>

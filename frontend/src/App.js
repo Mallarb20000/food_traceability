@@ -1,7 +1,7 @@
 import './App.css';
 import { Routes, Route, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-
+import ProductPage from "./pages/ProductPages";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import FarmerDashboard from './pages/FarmerDashboard';
@@ -33,6 +33,8 @@ function App() {
         <Route path="/" element={<div className="p-4">Welcome to Food Traceability</div>} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/product/:id" element={<ProductPage />} />
+
 
         <Route
           path="/dashboard"
