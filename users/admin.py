@@ -1,10 +1,10 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from django.contrib.auth.forms import UserChangeForm  # Correct import
+from django.contrib.auth.forms import UserChangeForm
 from .models import CustomUser
 from django import forms
 
-# Custom form for adding users
+# Form for creating users in admin
 class CustomUserCreationForm(forms.ModelForm):
     password1 = forms.CharField(label='Password', widget=forms.PasswordInput)
     password2 = forms.CharField(label='Password confirmation', widget=forms.PasswordInput)
@@ -27,13 +27,12 @@ class CustomUserCreationForm(forms.ModelForm):
             user.save()
         return user
 
-# Custom UserAdmin
+# Custom admin setup for CustomUser model
 class CustomUserAdmin(UserAdmin):
-    add_form = CustomUserCreationForm  # Form for adding users
-    form = UserChangeForm              # Form for editing users (correctly imported)
+    add_form = CustomUserCreationForm
+    form = UserChangeForm
     model = CustomUser
 
-    # Fields for the edit form (second step)
     fieldsets = (
         (None, {'fields': ('username', 'password')}),
         ('Personal info', {'fields': ('first_name', 'last_name', 'email')}),
@@ -41,7 +40,6 @@ class CustomUserAdmin(UserAdmin):
         ('Important dates', {'fields': ('last_login', 'date_joined')}),
         ('Custom fields', {'fields': ('role',)}),
     )
-    # Fields for the add form (first step)
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
@@ -50,5 +48,5 @@ class CustomUserAdmin(UserAdmin):
     )
     list_display = ('username', 'email', 'role', 'is_staff')
 
-# Register the model
+# Register model with custom admin
 admin.site.register(CustomUser, CustomUserAdmin)

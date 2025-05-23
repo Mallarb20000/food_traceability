@@ -1,13 +1,178 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+:root {
+  /* Brand and theme color variables */
+  --brand-primary:   #2a9df4;
+  --brand-dark:      #1b6ca8;
+
+  --bg-light:        #f5f7fa;
+  --text-light:      #212529;
+  --card-light:      #ffffff;
+  --border-light:    #dee2e6;
+
+  --bg-dark:         #121212;
+  --text-dark:       #e0e0e0;
+  --card-dark:       #1e1e1e;
+  --border-dark:     #333333;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+/* Ensure full height layout */
+html, body, #root {
+  height: 100%;
+  margin: 0;
+}
+
+/* Light theme (default) */
+body {
+  background-color: var(--bg-light);
+  background-image: url("./images/light-wallpaper.png");
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  color: var(--text-light);
+}
+
+/* Dark theme toggle */
+body.dark-mode {
+  background-color: var(--bg-dark);
+  background-image: url("./images/dark-wallpaper.png");
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  color: var(--text-dark);
+}
+
+/* Navbar background color */
+nav.navbar {
+  background-color: var(--brand-primary) !important;
+}
+body.dark-mode nav.navbar {
+  background-color: var(--brand-dark) !important;
+}
+
+/* Card and modal box styles */
+.card, .modal-content {
+  background-color: var(--card-light) !important;
+  border: 1px solid var(--border-light) !important;
+  color: inherit;
+}
+body.dark-mode .card,
+body.dark-mode .modal-content {
+  background-color: var(--card-dark) !important;
+  border: 1px solid var(--border-dark) !important;
+  color: var(--text-dark);
+}
+
+/* Table color styles */
+.table {
+  color: inherit;
+}
+.table-striped tbody tr:nth-of-type(odd) {
+  background: rgba(0, 0, 0, 0.05);
+}
+body.dark-mode .table {
+  color: var(--text-dark);
+}
+body.dark-mode .table-striped tbody tr:nth-of-type(odd) {
+  background-color: #2a2a2a;
+}
+body.dark-mode .table thead th {
+  background-color: var(--border-dark);
+  color: var(--text-dark);
+}
+body.dark-mode .table th,
+body.dark-mode .table td {
+  border-color: var(--border-dark);
+}
+
+/* Input fields – light mode */
+body:not(.dark-mode) .form-control {
+  background-color: #fff;
+  color: var(--text-light);
+  border: 1px solid var(--border-light);
+}
+body:not(.dark-mode) .form-control::placeholder {
+  color: #666;
+}
+
+/* Input fields – dark mode */
+body.dark-mode .form-control {
+  background-color: var(--card-dark);
+  color: var(--text-dark);
+  border: 1px solid var(--border-dark);
+}
+body.dark-mode .form-control::placeholder {
+  color: #aaa;
+}
+
+/* Primary buttons */
+.btn-primary {
+  background-color: var(--brand-primary);
+  border-color: var(--brand-primary);
+}
+.btn-primary:hover {
+  background-color: var(--brand-dark);
+  border-color: var(--brand-dark);
+}
+body.dark-mode .btn-primary {
+  background-color: var(--brand-dark);
+  border-color: var(--brand-dark);
+}
+body.dark-mode .btn-primary:hover {
+  background-color: var(--brand-primary);
+  border-color: var(--brand-primary);
+}
+
+/* Outline-style buttons */
+.btn-outline-light {
+  color: #fff;
+  border-color: #fff;
+}
+.btn-outline-light:hover {
+  background-color: #fff;
+  color: var(--brand-primary);
+}
+body.dark-mode .btn-outline-light {
+  color: var(--text-dark);
+  border-color: var(--text-dark);
+}
+
+/* Light/dark form card overrides (for login/register pages) */
+.login-container .card,
+.register-page .card {
+  background-color: var(--card-light) !important;
+  color: var(--text-light);
+}
+body.dark-mode .login-container .card,
+body.dark-mode .register-page .card {
+  background-color: var(--card-dark) !important;
+  color: var(--text-dark);
+}
+
+/* Landing page background for light and dark modes */
+.landing-page {
+  background: url("./images/light-wallpaper.png") center/cover no-repeat;
+  height: 100vh;
+  width: 100%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+body.dark-mode .landing-page {
+  background: url("./images/dark-wallpaper.png") center/cover no-repeat;
+}
+
+/* Transparent dark overlay */
+.overlay {
+  background-color: rgba(0, 0, 0, 0.4);
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Centered content inside landing page */
+.landing-content {
+  max-width: 800px;
+  padding: 2rem;
 }

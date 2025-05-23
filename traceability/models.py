@@ -1,27 +1,37 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 
+# Reference to the custom user model 
 CustomUser = get_user_model()
 
+# FoodItem model stores produce added by farmers
 class FoodItem(models.Model):
-    name = models.CharField(max_length=100)
-    origin = models.CharField(max_length=100)
-    batch_number = models.CharField(max_length=50, unique=True)
-    farmer = models.ForeignKey(CustomUser, on_delete=models.CASCADE, limit_choices_to={'role': 'farmer'})
-    created_at = models.DateTimeField(auto_now_add=True)
-    qr_code = models.ImageField(upload_to='qr_codes/', null=True, blank=True)
+    name = models.CharField(max_length=100) 
+    origin = models.CharField(max_length=100)  
+    batch_number = models.CharField(max_length=20, unique=True) 
+    farmer = models.ForeignKey(
+        CustomUser, 
+        on_delete=models.CASCADE, 
+        limit_choices_to={'role': 'farmer'} 
+    )
+    created_at = models.DateTimeField(auto_now_add=True)  
+    qr_code = models.ImageField(upload_to='qr_codes/', null=True, blank=True) 
 
     def __str__(self):
-        return f"{self.name} - {self.batch_number}"
+        return f"{self.name} - {self.batch_number}" 
 
+# TransportLog model tracks the movement of food items
 class TransportLog(models.Model):
-    food_item = models.ForeignKey(FoodItem, on_delete=models.CASCADE)
-    retailer = models.ForeignKey(CustomUser, on_delete=models.CASCADE, limit_choices_to={'role': 'retailer'})
-    transport_date = models.DateTimeField()
-    vehicle_details = models.CharField(max_length=100)
-    destination = models.CharField(max_length=100)
-    on_shelf = models.BooleanField(default=False)
+    food_item = models.ForeignKey(FoodItem, on_delete=models.CASCADE) 
+    retailer = models.ForeignKey(
+        CustomUser, 
+        on_delete=models.CASCADE, 
+        limit_choices_to={'role': 'retailer'} 
+    )
+    transport_date = models.DateTimeField()  
+    vehicle_details = models.CharField(max_length=100)  
+    destination = models.CharField(max_length=100)  
+    on_shelf = models.BooleanField(default=False)  
 
     def __str__(self):
-        return f"{self.food_item.name} to {self.destination}"
-
+        return f"{self.food_item.name} to {self.destination}" 

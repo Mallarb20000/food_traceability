@@ -1,81 +1,101 @@
-import { useState } from "react";
-import axios from "axios";
+import React, { useState } from "react";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
 import { useNavigate } from "react-router-dom";
+import api from "../api";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-const Login = () => {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+// Validation schema
+const schema = yup.object({
+  username: yup.string().required("Username is required"),
+  password: yup.string().required("Password is required"),
+});
+
+export default function Login() {
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm({
+    resolver: yupResolver(schema),
+  });
 
+  const onSubmit = async ({ username, password }) => {
     try {
-      const res = await axios.post("http://localhost:8000/api/users/login/", {
-        username,
-        password,
-      });
+      const res = await api.post("users/login/", { username, password });
+      const { role } = res.data;
 
-      const { access, refresh, role } = res.data;
-
-      // Save to localStorage
-      localStorage.setItem("access", access);
-      localStorage.setItem("refresh", refresh);
       localStorage.setItem("role", role);
-      localStorage.setItem("username", username); 
+      localStorage.setItem("username", username);
 
-      // Redirect based on role
-      if (role === "farmer") {
-        navigate("/dashboard/farmer");
-      } else if (role === "retailer") {
-        navigate("/dashboard/retailer");
-      } else {
-        navigate("/dashboard");
-      }
+      if (role === "farmer") navigate("/dashboard/farmer");
+      else if (role === "retailer") navigate("/dashboard/retailer");
+      else navigate("/dashboard");
     } catch (err) {
       console.error("Login failed:", err.response?.data || err);
-      alert("Login failed. Please check credentials.");
+      toast.error("🚫 Invalid credentials. Please try again.", {
+        position: "top-center",
+        autoClose: 3000,
+        theme: "colored",
+      });
     }
   };
 
-  return (    
-      <div className="container mt-5">
-        <div className="row justify-content-center">
-          <div className="col-md-6">
-            <form onSubmit={handleLogin} className="card p-4 shadow">
-              <h2 className="mb-4 text-center">Login</h2>
-    
-              <div className="mb-3">
-                <input
-                  type="text"
-                  className="form-control"
-                  placeholder="Username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  required
-                />
-              </div>
-    
-              <div className="mb-3">
-                <input
-                  type="password"
-                  className="form-control"
-                  placeholder="Password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
-              </div>
-    
-              <button type="submit" className="btn btn-primary w-100">
-                Login
-              </button>
-            </form>
-          </div>
-        </div>
-      </div>
-    );
-}
-    
+  return (
+    <div className="d-flex justify-content-center align-items-center vh-100">
+      <ToastContainer />
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="card shadow p-5"
+        style={{ width: "100%", maxWidth: "480px", minHeight: "480px" }}
+      >
+        <h2 className="mb-5 text-center">Login</h2>
 
-export default Login;
+        {/* Username */}
+        <div className="mb-4">
+          <input
+            {...register("username")}
+            className={`form-control ${errors.username ? "is-invalid" : ""}`}
+            placeholder="Username"
+          />
+          {errors.username && (
+            <div className="invalid-feedback">{errors.username.message}</div>
+          )}
+        </div>
+
+        {/* Password + Toggle */}
+        <div className="mb-5 input-group">
+          <input
+            {...register("password")}
+            type={showPassword ? "text" : "password"}
+            className={`form-control ${errors.password ? "is-invalid" : ""}`}
+            placeholder="Password"
+          />
+          <button
+            type="button"
+            className="btn btn-outline-secondary"
+            onClick={() => setShowPassword((prev) => !prev)}
+          >
+            {showPassword ? "Hide" : "Show"}
+          </button>
+          {errors.password && (
+            <div className="invalid-feedback d-block">{errors.password.message}</div>
+          )}
+        </div>
+
+        <button
+          type="submit"
+          className="btn btn-primary w-100"
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? "Logging in…" : "Login"}
+        </button>
+      </form>
+    </div>
+  );
+}
