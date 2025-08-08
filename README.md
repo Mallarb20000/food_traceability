@@ -11,7 +11,7 @@ In local food markets, it's often difficult for consumers to know the origin and
 * **Product Registration:** Users can add new products to the system with details like name, origin, and farmer information.
 * **Traceability Records:** Log entries can be added to each product to track its journey (e.g., "Harvested," "Packaged," "Shipped to Market").
 * **RESTful API:** A secure and well-structured API to manage product and traceability data.
-* **[Add another feature, e.g., QR Code Generation logic if you implemented it]**
+
 
 ## Technologies Used
 
