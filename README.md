@@ -1,4 +1,4 @@
-# Food Traceability API
+# Food Traceability Webapplication
 
 This project is a Django REST Framework application designed to provide a simple and cost-effective food traceability solution for small-scale farmers. It allows for the creation of products and the tracking of their journey from farm to consumer via a scannable QR code system.
 
@@ -44,4 +44,4 @@ In local food markets, it's often difficult for consumers to know the origin and
     ```bash
     python manage.py runserver
     ```
-The API will then be accessible at `http://127.0.0.1:8000`.
+
